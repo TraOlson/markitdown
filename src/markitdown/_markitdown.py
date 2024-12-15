@@ -845,7 +845,9 @@ class UnsupportedFormatException(BaseException):
     pass
 
 
-class MarkItDown:
+import fitz  # PyMuPDF
+
+class Markitdown:
     """(In preview) An extremely simple text-based document reader, suitable for LLM use.
     This reader will convert common file-types or webpages to Markdown."""
 
@@ -1099,3 +1101,16 @@ class MarkItDown:
     def register_page_converter(self, converter: DocumentConverter) -> None:
         """Register a page text converter."""
         self._page_converters.insert(0, converter)
+
+    def convert_pdf_to_text(self, pdf_path: str) -> str:
+        """Convert a PDF file to text."""
+        try:
+            document = fitz.open(pdf_path)
+            text = ""
+            for page_num in range(len(document)):
+                page = document.load_page(page_num)
+                text += page.get_text()
+            return text
+        except Exception as e:
+            print(f"Error converting PDF to text: {e}")
+            return ""
